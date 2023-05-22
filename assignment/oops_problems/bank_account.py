@@ -27,104 +27,116 @@ class Bank:
 """
 
 
-class BankAccount:
+class Account:
     def __init__(self, account_number, account_holder_name, balance):
         self.account_number = account_number
         self.account_holder_name = account_holder_name
         self.balance = balance
-        self.dict = {self.account_number: {"account_holder_name": self.account_holder_name, "account_number": self.account_number,
-                          "balance": self.balance}}
+        self.dict = {self.account_number: {"account_holder_name": self.account_holder_name,
+                                           "account_number": self.account_number,
+                                           "balance": self.balance}}
 
-    def deposit(self, amount):
-        self.balance += amount
-        self.dict.update({self.account_number: {"account_holder_name": self.account_holder_name, "account_number": self.account_number,
-                          "balance": self.balance}})
-        return self.dict
+    def deposit(self, amount, account_number):
+        if account_number in obj.final_dict.keys():
+            available_balance = obj.final_dict.get(account_number).get("balance")
+            balance = available_balance + amount
+            obj.final_dict.get(account_number).update({"balance": balance})
+            return f"Account Debited Successfully "
+        else:
+            return f"Enter correct account number"
 
-    def withdraw(self, amount):
-        self.balance -= amount
-        self.dict.update({self.account_number: {"account_holder_name": self.account_holder_name, "account_number": self.account_number,
-                                                "balance": self.balance}})
-        return self.dict
+    def withdraw(self, amount, account_number):
+        if account_number in obj.final_dict.keys():
+            if amount < obj.final_dict.get(account_number).get("balance"):
+                available_balance = obj.final_dict.get(account_number).get("balance")
+                balance = available_balance - amount
+                obj.final_dict.get(account_number).update({"balance": balance})
+                return "Withdraw Successfully"
+            else:
+                return f"Insufficient Balance"
+        else:
+            return f"Enter correct account number"
 
-    def display(self):
-        # print(self.dict)
-        return self.dict
+    def transfer(self, account1, account2, amount):
+        acc1_bal = obj.final_dict.get(account1).get("balance")
+        acc2_bal = obj.final_dict.get(account2).get("balance")
+        balance1 = acc1_bal - amount
+        obj.final_dict.get(account1).update({"balance": balance1})
+        balance2 = acc2_bal + amount
+        obj.final_dict.get(account2).update({"balance": balance2})
+        return f"Rs {amount} transfer to account {account2} from {account1}"
 
 
 class Bank:
+    def __init__(self):
+        self.input_dict = {}
+        self.final_dict = {}
+
+    def user_inputs(self):
+        account_number = int(input("Enter Account Number :"))
+        account_holder_name = input("Enter Account Holder Name :")
+        balance = int(input("Enter Creating Balance :"))
+        self.input_dict.update({"account_holder_name": account_holder_name,
+                                "account_number": account_number, "balance": balance})
+
     def create_account(self):
-        account_number = int(input("Enter Account Number"))
-        account_holder_name = input("Enter Account Holder Name")
-        balance = int(input("Enter Creating Balance"))
-        obj = BankAccount(account_number, account_holder_name, balance)
+        obj = Account(self.input_dict.get("account_number"), self.input_dict.get("account_holder_name"),
+                      self.input_dict.get("balance"))
+        self.final_dict.update(obj.dict)
         return obj
+
+    def open_account(self):
+        self.user_inputs()
+        obj = self.create_account()
+        print(obj.dict)
+        print("Account Created Successfully ")
 
     def deposit(self):
         obj = self.create_account()
-        amount = int(input("Enter amount"))
-        print(obj.deposit(amount))
-
+        account_number = int(input("Enter Account Number :"))
+        amount = int(input("Enter amount to deposit :"))
+        a_dict = obj.deposit(amount, account_number)
+        print(a_dict)
 
     def withdraw(self):
         obj = self.create_account()
-        amount = int(input("Enter amount"))
-        obj.withdraw(amount)
+        account_number = int(input("Enter Account Number :"))
+        amount = int(input("Enter amount to withdraw :"))
+        a_dict = obj.withdraw(amount, account_number)
+        print(a_dict)
 
-    # def transfer(self, amount, account1, account2):
-    #     pass
+    def transfer_money(self):
+        obj = self.create_account()
+        account1 = int(input("Enter account number from transfer"))
+        account2 = int(input("Enter account number to transfer"))
+        amount = int(input("Enter amount to transfer"))
+        a_dict = obj.transfer(account1, account2, amount)
+        print(a_dict)
 
-    # def display_data(self):
-    #     obj = self.create_account()
-    #     obj.display()
+    def display_data(self):
+        print(self.final_dict)
 
-
-
-
-
-
-    # def transfer_balance(self):
-    #     # amount
-    #     print(self.dict.get(self.id))
-    # bank = BankAccount()
-
-
-    # def display_data(self):
-    #     print(self.dict)
-
-        # print(
-        #     " account_holder_name \taccount_number \tbalance ")
-        # for key, value in self.dict.items():
-        #     print(key, value)
-            # print("\t{}\t\t\t\t{}\t\t\t\t{}".format(value.account_holder_name, value.account_number,
-            #                                                     value.balance))
+    def display_account_info(self):
+        account_number = int(input("Enter account number :"))
+        print(self.final_dict.get(account_number))
 
 
 if __name__ == '__main__':
-    # bank_acc = BankAccount(123456789, "milan", 2000)
-    # print(bank_acc.deposit(2000))
-    # print()
-    # print(bank_acc.withdraw(500))
-    # print()
 
-    # bank_acc = BankAccount(21354645, "raj", 0)
-    # print(bank_acc.deposit(2000))
-    print()
-
-    # print(bank_acc.transfer_balance(2000, 21354645))
-    print()
-
-    # print(bank_acc.transfer_balance())
-    print()
-
-    # bank_acc.display_data()
     obj = Bank()
-    obj.deposit()
-    # obj.display_data()
-    # obj.withdraw()
+    while True:
+        print("Enter \n 1 For Creating Bank Account \n 2 For deposit money \n 3 For withdraw money "
+              "\n 4 For Transfer Money \n 5 To Display All Accounts \n 6 For display particular account info")
+        choice = int(input("Enter any choice between 1 - 6 : "))
+        options = {1: obj.open_account,
+                   2: obj.deposit,
+                   3: obj.withdraw,
+                   4: obj.transfer_money,
+                   5: obj.display_data,
+                   6: obj.display_account_info
+                   }
 
-
-
-
-
-
+        if choice == 0:
+            break
+        else:
+            options.get(choice)()
